@@ -1,4 +1,4 @@
-GET http://localhost:8081/member/test
+GET http://localhost:8000/member/test
 Accept: application/json
 
 ###
