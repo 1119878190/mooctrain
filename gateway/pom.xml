@@ -7,10 +7,10 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>train-member</artifactId>
+    <artifactId>train-gateway</artifactId>
     <packaging>jar</packaging>
 
-    <name>member</name>
+    <name>train-gateway</name>
     <url>http://maven.apache.org</url>
 
     <properties>
@@ -25,29 +25,8 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>com.study</groupId>
-            <artifactId>train-common</artifactId>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-gateway</artifactId>
         </dependency>
     </dependencies>
-
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-                <configuration>
-                    <image>
-                        <builder>paketobuildpacks/builder-jammy-base:latest</builder>
-                    </image>
-                    <excludes>
-                        <exclude>
-                            <groupId>org.projectlombok</groupId>
-                            <artifactId>lombok</artifactId>
-                        </exclude>
-                    </excludes>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
 </project>
