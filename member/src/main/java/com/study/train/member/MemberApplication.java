@@ -7,10 +7,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.core.env.ConfigurableEnvironment;
 
 @SpringBootApplication
 @MapperScan("com.study.train.member.mapper")
+@ComponentScan("com.study.train")
 public class MemberApplication {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MemberApplication.class);
