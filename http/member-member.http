@@ -15,5 +15,13 @@ POST http://127.0.0.1:8000/member/member/sendCode
 Content-Type: application/json
 
 {
-  "mobile":"13546856958"
+  "mobile":"13546877777"
+}
+
+###
+POST http://127.0.0.1:8000/member/member/login
+Content-Type: application/json
+
+{
+"mobile":"13546877777", "code":"8888"
 }
