@@ -5,6 +5,8 @@ public class MemberLoginResp {
     private String id;
     private String mobile;
 
+    private String token;
+
     public String getId() {
         return id;
     }
@@ -21,11 +23,20 @@ public class MemberLoginResp {
         this.mobile = mobile;
     }
 
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
+
     @Override
     public String toString() {
         return "MemberLoginResp{" +
                 "id='" + id + '\'' +
                 ", mobile='" + mobile + '\'' +
+                ", token='" + token + '\'' +
                 '}';
     }
 }

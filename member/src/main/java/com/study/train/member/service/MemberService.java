@@ -6,6 +6,7 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.RandomUtil;
 import com.study.train.common.exception.BusinessException;
 import com.study.train.common.exception.BusinessExceptionEnum;
+import com.study.train.common.util.JwtTokenUtil;
 import com.study.train.common.util.SnowUtil;
 import com.study.train.member.domain.Member;
 import com.study.train.member.domain.MemberExample;
@@ -20,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 @Service
@@ -82,17 +84,22 @@ public class MemberService {
     public MemberLoginResp login(MemberLoginReq req) {
         String mobile = req.getMobile();
         Member memberDB = selectByMobile(mobile);
-        if (Objects.isNull(memberDB)){
+        if (Objects.isNull(memberDB)) {
             // 若为null 说明没有获取验证码,如果未注册,获取验证码时自动注册
             throw new BusinessException(BusinessExceptionEnum.MEMBER_MOBILE_NOT_EXIST);
         }
 
         // 比对验证码 这里为了方便写死了，后续可从redis中查询出来比对
-        if (!"8888".equals(req.getCode())){
+        if (!"8888".equals(req.getCode())) {
             throw new BusinessException(BusinessExceptionEnum.MEMBER_MOBILE_CODE_ERROR);
         }
 
         MemberLoginResp resp = BeanUtil.copyProperties(memberDB, MemberLoginResp.class);
+        // 生成token
+        Map<String, Object> map = BeanUtil.beanToMap(resp);
+        String token = JwtTokenUtil.createToken(map);
+        LOGGER.info("生成token:{}", token);
+        resp.setToken(token);
         return resp;
 
     }
