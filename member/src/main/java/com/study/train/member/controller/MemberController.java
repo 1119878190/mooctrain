@@ -18,8 +18,8 @@ public class MemberController {
     private MemberService memberService;
 
     @GetMapping("/count")
-    public Integer count() {
-        return memberService.count();
+    public CommonResp<Integer> count() {
+        return new CommonResp<>(memberService.count());
     }
 
 
