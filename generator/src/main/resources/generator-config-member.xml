@@ -41,7 +41,8 @@
                              targetPackage="com.study.train.member.mapper"
                              type="XMLMAPPER"/>
 
-        <!--    需要生成的表面    -->
-        <table tableName="member" domainObjectName="Member"/>
+        <!--    需要生成的表名 方法名    -->
+<!--        <table tableName="member" domainObjectName="Member"/>-->
+        <table tableName="passenger" domainObjectName="Passenger"/>
     </context>
 </generatorConfiguration>
