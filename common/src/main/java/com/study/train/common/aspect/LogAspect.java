@@ -1,6 +1,5 @@
 package com.study.train.common.aspect;
 
-import cn.hutool.core.util.RandomUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.support.spring.PropertyPreFilters;
 import jakarta.servlet.ServletRequest;
@@ -15,7 +14,6 @@ import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -41,7 +39,8 @@ public class LogAspect {
     public void doBefore(JoinPoint joinPoint) {
 
         //  用来填充 Logback-spring中的 LOG_ID，这里只是简单的生成，有重复的可能
-        MDC.put("LOG_ID",System.currentTimeMillis() + RandomUtil.randomString(3));
+        // 日志流水号移至LogInterceptor
+       // MDC.put("LOG_ID",System.currentTimeMillis() + RandomUtil.randomString(3));
 
 
         // 开始打印请求日志
