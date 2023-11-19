@@ -1,23 +1,42 @@
-package com.study.train.member.domain;
+package com.study.train.member.req;
 
 import java.util.Date;
 
-/**
- * 乘车人
- */
-public class Passenger {
+public class PassengerSaveReq {
+
+    /**
+     * id
+     */
     private Long id;
 
+    /**
+     * 会员id
+     */
     private Long memberId;
 
+    /**
+     * 姓名
+     */
     private String name;
 
+    /**
+     * 身份证
+     */
     private String idCard;
 
+    /**
+     * 旅客类型|枚举[PassengerTypeEnum]
+     */
     private String type;
 
+    /**
+     * 新增时间
+     */
     private Date createTime;
 
+    /**
+     * 修改时间
+     */
     private Date updateTime;
 
     public Long getId() {
