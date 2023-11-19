@@ -76,7 +76,7 @@ export default defineComponent({
         if (data.success) {
           notification.success({ description: '登录成功！' });
           // 登录成功，跳到控台主页
-          router.push("/");
+          router.push("/welcome");
           // 将返回的用户信息写到store中
           store.commit("setMember",data.content)
         } else {

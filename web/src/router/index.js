@@ -14,7 +14,14 @@ const routes = [
     meta: {
       // 自定义属性 页面是否需要登录
       loginRequire: true
-    }
+    },
+    children: [{
+      path: 'welcome',
+      component: () => import('../views/main/welcome.vue'),
+    }]
+  }, {
+    path: '',
+    redirect: '/welcome'
   }
 ]
 
