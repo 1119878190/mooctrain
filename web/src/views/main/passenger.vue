@@ -22,6 +22,8 @@
 
 <script>
 import {defineComponent, reactive, ref} from 'vue';
+import axios from "axios";
+import {notification} from "ant-design-vue";
 
 
 
@@ -47,8 +49,15 @@ export default defineComponent({
 
     // 确认新增
     const handleOk = () => {
-      console.log("ok=======");
-      visible.value = false;
+      axios.post("/member/passenger/save",passenger).then((response) =>{
+        const data = response.data;
+        if (data.success){
+          notification.success({description: "保存成功！"});
+          visible.value = false;
+        }else {
+          notification.error({description: data.message});
+        }
+      })
     };
 
     return {
