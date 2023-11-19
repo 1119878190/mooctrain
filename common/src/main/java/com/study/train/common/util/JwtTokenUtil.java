@@ -13,7 +13,7 @@ import java.util.Map;
 public class JwtTokenUtil {
 
     public static String secret = "luuu-train";
-    public static int expire = 60;
+    public static int expire = 60 * 60;
     public static String header;
 
     /**
