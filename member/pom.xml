@@ -28,7 +28,10 @@
             <groupId>com.study</groupId>
             <artifactId>train-common</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>com.github.pagehelper</groupId>
+            <artifactId>pagehelper-spring-boot-starter</artifactId>
+        </dependency>
     </dependencies>
 
 
