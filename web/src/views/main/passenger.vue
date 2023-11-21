@@ -13,6 +13,12 @@
     <template #bodyCell="{ column, record }">
       <template v-if="column.dataIndex === 'operation'">
        <a-space>
+         <a-popconfirm
+             title="删除后不可恢复，确认删除?"
+             @confirm="onDelete(record)"
+             ok-text="确认" cancel-text="取消">
+           <a style="color: red">删除</a>
+         </a-popconfirm>
          <a @click="onEdit(record)">编辑</a>
        </a-space>
       </template>
@@ -40,7 +46,7 @@
 </template>
 
 <script>
-import {defineComponent, ref, onMounted, reactive} from 'vue';
+import {defineComponent, ref, onMounted} from 'vue';
 import axios from "axios";
 import {notification} from "ant-design-vue";
 
@@ -64,7 +70,7 @@ export default defineComponent({
     // 表单数据
     const passengers = ref([]);
     // 分页的三个属性名是固定的
-    const pagination = reactive({
+    const pagination = ref({
       total: 0,
       current: 1,
       pageSize: 2,
@@ -104,6 +110,21 @@ export default defineComponent({
       visible.value = true;
     };
 
+    const onDelete = (record) => {
+      axios.delete("/member/passenger/delete/" + record.id).then((response) => {
+        const data = response.data;
+        if (data.success) {
+          notification.success({description: "删除成功！"});
+          handleQuery({
+            page: pagination.value.current,
+            size: pagination.value.pageSize,
+          });
+        } else {
+          notification.error({description: data.message});
+        }
+      });
+    };
+
     // 确认新增
     const handleOk = () => {
       axios.post("/member/passenger/save",passenger.value).then((response) =>{
@@ -111,6 +132,10 @@ export default defineComponent({
         if (data.success){
           notification.success({description: "保存成功！"});
           visible.value = false;
+          handleQuery({
+            page: pagination.value.current,
+            size: pagination.value.pageSize
+          });
         }else {
           notification.error({description: data.message});
         }
@@ -122,7 +147,7 @@ export default defineComponent({
       if (!param) {
         param = {
           page: 1,
-          size: pagination.pageSize
+          size: pagination.value.pageSize
         };
       }
       loading.value = true;
@@ -134,13 +159,12 @@ export default defineComponent({
       }).then((response) => {
         loading.value = false;
         let data = response.data;
-        console.log(data,"12312312312")
         if (data.success) {
           passengers.value = data.content.list;
-          pagination.total = data.content.total;
+          pagination.value.total = data.content.total;
           // 设置分页控件的值
-          console.log(param,"1111111111111")
-          pagination.current = param.page;
+          pagination.value.current = param.page;
+          pagination.value.total = data.content.total;
         } else {
           notification.error({description: data.message});
         }
@@ -157,7 +181,7 @@ export default defineComponent({
     onMounted(() => {
       handleQuery({
         page: 1,
-        size: pagination.pageSize
+        size: pagination.value.pageSize
       });
     });
 
@@ -172,7 +196,8 @@ export default defineComponent({
       handleTableChange,
       handleQuery,
       loading,
-      onEdit
+      onEdit,
+      onDelete
 
     };
   },
