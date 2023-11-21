@@ -36,4 +36,11 @@ public class PassengerController {
         req.setMemberId(LoginMemberContext.getId());
         return new CommonResp<>(passengerService.queryList(req));
     }
+
+    @DeleteMapping("/delete/{id}")
+    public CommonResp<Object> delete(@PathVariable Long id) {
+        passengerService.delete(id);
+        return new CommonResp<>();
+    }
+
 }
