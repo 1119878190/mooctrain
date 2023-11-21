@@ -7,7 +7,18 @@
            :columns="columns"
            :pagination="pagination"
            v-on:change="handleTableChange"
-           :loading="loading"/>
+           :loading="loading">
+
+  <!-- 操作列   -->
+    <template #bodyCell="{ column, record }">
+      <template v-if="column.dataIndex === 'operation'">
+       <a-space>
+         <a @click="onEdit(record)">编辑</a>
+       </a-space>
+      </template>
+    </template>
+
+  </a-table>
   <a-modal v-model:visible="visible" title="乘车人" @ok="handleOk"
            ok-text="确认" cancel-text="取消">
     <a-form :model="passenger" :label-col="{span: 4}" :wrapper-col="{ span: 20 }">
@@ -87,6 +98,11 @@ export default defineComponent({
       visible.value = true;
     };
 
+    const onEdit = (record) => {
+      passenger.value = record
+      visible.value = true;
+    };
+
     // 确认新增
     const handleOk = () => {
       axios.post("/member/passenger/save",passenger.value).then((response) =>{
@@ -155,6 +171,7 @@ export default defineComponent({
       handleTableChange,
       handleQuery,
       loading,
+      onEdit
 
     };
   },
