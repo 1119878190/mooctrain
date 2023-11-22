@@ -14,6 +14,28 @@ public class ServerGenerator {
 
     public static void main(String[] args) throws DocumentException {
 
+        // 读取 pom.xml 中指定的持久层xml文件路径
+        String generatorPath = getGeneratorPath();
+
+        // 读取生成器配置信息 获取表名和实体名
+        Document document = new SAXReader().read("generator/" + generatorPath);
+        Node table = document.selectSingleNode("//table");
+        System.out.println(table);
+        Node tableName = table.selectSingleNode("@tableName");
+        Node domainObjectName = table.selectSingleNode("@domainObjectName");
+        System.out.println(tableName.getText() + "/" + domainObjectName.getText());
+
+
+    }
+
+
+    /**
+     * 获取pom中  configurationFile 的配置
+     *
+     * @return
+     * @throws DocumentException
+     */
+    private static String getGeneratorPath() throws DocumentException {
         // 读取pom
         SAXReader saxReader = new SAXReader();
         Map<String, String> map = new HashMap<String, String>();
@@ -22,7 +44,6 @@ public class ServerGenerator {
         Document document = saxReader.read(pomPath);
         Node node = document.selectSingleNode("//pom:configurationFile");
         System.out.println(node.getText());
-
-
+        return node.getText();
     }
 }
