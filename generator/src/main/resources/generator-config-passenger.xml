@@ -43,6 +43,6 @@
 
         <!--    需要生成的表名 方法名    -->
 <!--        <table tableName="member" domainObjectName="Member"/>-->
-        <table tableName="business" domainObjectName="Business"/>
+        <table tableName="passenger" domainObjectName="Passenger"/>
     </context>
 </generatorConfiguration>
