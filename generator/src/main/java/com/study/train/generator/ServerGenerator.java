@@ -15,9 +15,14 @@ import java.util.*;
 
 public class ServerGenerator {
 
+    static boolean readOnly = false;
+    static String vuePath = "admin/src/views/main/";
+
 //    static String serverPath = "member/src/main/java/com/study/train/member/service/";
     static String serverPath = "[module]/src/main/java/com/study/train/[module]/";
     static String pomPath = "generator/pom.xml";
+
+    static String module = "";
 
 
     public static void main(String[] args) throws Exception {
@@ -85,6 +90,8 @@ public class ServerGenerator {
         gen(Domain, param, "req", "saveReq");
         gen(Domain, param, "req", "queryReq");
         gen(Domain, param, "resp", "queryResp");
+
+
     }
 
     private static void gen(String Domain, Map<String, Object> param, String packageName, String target) throws IOException, TemplateException {
@@ -96,6 +103,15 @@ public class ServerGenerator {
         System.out.println("开始生成：" + fileName);
         FreemarkerUtil.generator(fileName, param);
     }
+
+    private static void genVue(String do_main, Map<String, Object> param) throws IOException, TemplateException {
+        FreemarkerUtil.initConfig("vue.ftl");
+        new File(vuePath + module).mkdirs();
+        String fileName = vuePath + module + "/" + do_main + ".vue";
+        System.out.println("开始生成：" + fileName);
+        FreemarkerUtil.generator(fileName, param);
+    }
+
 
 
     /**
