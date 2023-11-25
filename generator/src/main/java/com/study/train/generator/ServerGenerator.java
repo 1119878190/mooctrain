@@ -72,12 +72,17 @@ public class ServerGenerator {
         param.put("Domain", Domain);
         param.put("domain", domain);
         param.put("do_main", do_main);
+        param.put("tableNameCn", tableNameCn);
+        param.put("fieldList", fieldList);
+        param.put("typeSet", typeSet);
+        System.out.println("组装参数：" + param);
 
 
         // 生成service
 //        gen(Domain, param, "service", "service");
         // 生成controller
 //        gen(Domain, param, "controller", "controller");
+        gen(Domain, param, "req", "saveReq");
     }
 
     private static void gen(String Domain, Map<String, Object> param, String packageName, String target) throws IOException, TemplateException {
