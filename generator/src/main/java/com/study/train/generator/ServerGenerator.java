@@ -15,7 +15,7 @@ import java.util.Map;
 public class ServerGenerator {
 
 //    static String serverPath = "member/src/main/java/com/study/train/member/service/";
-    static String serverPath = "[module]/src/main/java/com/study/train/[module]/service/";
+    static String serverPath = "[module]/src/main/java/com/study/train/[module]/";
     static String pomPath = "generator/pom.xml";
 
 
@@ -59,9 +59,20 @@ public class ServerGenerator {
         param.put("do_main", do_main);
 
 
-        // 生成
-        FreemarkerUtil.initConfig("service.ftl");
-        FreemarkerUtil.generator(serverPath + Domain + "Service.java",param);
+        // 生成service
+//        gen(Domain, param, "service", "service");
+        // 生成controller
+        gen(Domain, param, "controller", "controller");
+    }
+
+    private static void gen(String Domain, Map<String, Object> param, String packageName, String target) throws IOException, TemplateException {
+        FreemarkerUtil.initConfig(target + ".ftl");
+        String toPath = serverPath + packageName + "/";
+        new File(toPath).mkdirs();
+        String Target = target.substring(0, 1).toUpperCase() + target.substring(1);
+        String fileName = toPath + Domain + Target + "123.java";
+        System.out.println("开始生成：" + fileName);
+        FreemarkerUtil.generator(fileName, param);
     }
 
 
