@@ -1,20 +1,19 @@
-package com.study.train.member.service;
+package com.study.train.${module}.service;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.util.ObjectUtil;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
-import com.study.train.common.context.LoginMemberContext;
 import com.study.train.common.resp.PageResp;
 import com.study.train.common.util.SnowUtil;
-import com.study.train.member.domain.${Domain};
-import com.study.train.member.domain.${Domain}Example;
-import com.study.train.member.mapper.MemberMapper;
-import com.study.train.member.mapper.${Domain}Mapper;
-import com.study.train.member.req.${Domain}QueryReq;
-import com.study.train.member.req.${Domain}SaveReq;
-import com.study.train.member.resp.${Domain}QueryResp;
+import com.study.train.${module}.domain.${Domain};
+import com.study.train.${module}.domain.${Domain}Example;
+import com.study.train.${module}.mapper.MemberMapper;
+import com.study.train.${module}.mapper.${Domain}Mapper;
+import com.study.train.${module}.req.${Domain}QueryReq;
+import com.study.train.${module}.req.${Domain}SaveReq;
+import com.study.train.${module}.resp.${Domain}QueryResp;
 import jakarta.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +33,7 @@ public class ${Domain}Service {
     private ${Domain}Mapper ${domain}Mapper;
 
     @Resource
-    private MemberMapper memberMapper;
+    private MemberMapper ${module}Mapper;
 
     /**
      * 新增或保存
@@ -45,7 +44,6 @@ public class ${Domain}Service {
         DateTime now = DateTime.now();
         ${Domain} ${domain} = BeanUtil.copyProperties(req, ${Domain}.class);
         if (ObjectUtil.isNull(${domain}.getId())) {
-            ${domain}.setMemberId(LoginMemberContext.getId());
             ${domain}.setId(SnowUtil.getSnowflakeNextId());
             ${domain}.setCreateTime(now);
             ${domain}.setUpdateTime(now);
@@ -61,9 +59,7 @@ public class ${Domain}Service {
     public PageResp<${Domain}QueryResp> queryList(${Domain}QueryReq req) {
         ${Domain}Example ${domain}Example = new ${Domain}Example();
         ${Domain}Example.Criteria criteria = ${domain}Example.createCriteria();
-        if (ObjectUtil.isNotNull(req.getMemberId())) {
-            criteria.andMemberIdEqualTo(req.getMemberId());
-        }
+
 
         Page<Object> page = PageHelper.startPage(req.getPage(), req.getSize());
         List<${Domain}> ${domain}List = ${domain}Mapper.selectByExample(${domain}Example);
