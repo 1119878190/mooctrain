@@ -1,7 +1,7 @@
 package com.study.train.${module}.controller;
 
 
-import com.study.train.common.context.LoginMemberContext;
+
 import com.study.train.common.resp.CommonResp;
 import com.study.train.common.resp.PageResp;
 import com.study.train.${module}.req.${Domain}QueryReq;
@@ -33,7 +33,6 @@ public class ${Domain}Controller {
 
     @GetMapping("/query-list")
     public CommonResp<PageResp<${Domain}QueryResp>> queryList(@Valid ${Domain}QueryReq req) {
-        req.setMemberId(LoginMemberContext.getId());
         return new CommonResp<>(${domain}Service.queryList(req));
     }
 
