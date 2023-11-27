@@ -8,13 +8,10 @@
     </parent>
 
     <artifactId>train-generator</artifactId>
-    <packaging>jar</packaging>
-
-    <name>generator</name>
-    <url>http://maven.apache.org</url>
 
     <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
     </properties>
 
     <dependencies>
@@ -65,8 +62,10 @@
                 <artifactId>mybatis-generator-maven-plugin</artifactId>
                 <version>1.4.0</version>
                 <configuration>
+                    <!--        需要在这里指定哪个.xml文件            -->
 <!--                    <configurationFile>src/main/resources/generator-config-member.xml</configurationFile>-->
-                    <configurationFile>src/main/resources/generator-config-passenger.xml</configurationFile>
+<!--                    <configurationFile>src/main/resources/generator-config-passenger.xml</configurationFile>-->
+                    <configurationFile>src/main/resources/generator-config-business.xml.xml</configurationFile>
                     <overwrite>true</overwrite>
                     <verbose>true</verbose>
                 </configuration>
