@@ -44,6 +44,7 @@
         <!--    需要生成的表名 方法名    -->
 <!--        <table tableName="member" domainObjectName="Member"/>-->
 <!--        <table tableName="passenger" domainObjectName="Passenger"/>-->
-        <table tableName="station" domainObjectName="Station"/>
+<!--        <table tableName="station" domainObjectName="Station"/>-->
+        <table tableName="train" domainObjectName="Train"/>
     </context>
 </generatorConfiguration>
