@@ -55,8 +55,6 @@ public class StationService {
 
     public PageResp<StationQueryResp> queryList(StationQueryReq req) {
         StationExample stationExample = new StationExample();
-        StationExample.Criteria criteria = stationExample.createCriteria();
-
 
         Page<Object> page = PageHelper.startPage(req.getPage(), req.getSize());
         List<Station> stationList = stationMapper.selectByExample(stationExample);

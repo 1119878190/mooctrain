@@ -56,8 +56,6 @@ public class TrainService {
 
     public PageResp<TrainQueryResp> queryList(TrainQueryReq req) {
         TrainExample trainExample = new TrainExample();
-        TrainExample.Criteria criteria = trainExample.createCriteria();
-
 
         Page<Object> page = PageHelper.startPage(req.getPage(), req.getSize());
         List<Train> trainList = trainMapper.selectByExample(trainExample);

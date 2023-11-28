@@ -12,6 +12,7 @@
     "@ant-design/icons-vue": "^6.1.0",
     "ant-design-vue": "^3.2.15",
     "axios": "^1.6.2",
+    "pinyin-pro": "^3.13.0",
     "core-js": "^3.8.3",
     "vue": "^3.2.13",
     "vue-router": "^4.0.3",
