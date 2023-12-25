@@ -56,7 +56,7 @@ export default defineComponent({
     };
 
     onMounted(() => {
-      queryAllTrain();
+      // queryAllTrain();
     });
 
     return {
