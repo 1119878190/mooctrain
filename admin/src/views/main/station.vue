@@ -88,7 +88,7 @@ export default defineComponent({
     }
     ];
 
-    // http://pinyin-pro.cn/
+    // http://pinyin-pro.cn/ 监听输入的name 自动填充下面的拼音
     watch(() => station.value.name, ()=>{
       if (Tool.isNotEmpty(station.value.name)) {
         station.value.namePinyin = pinyin(station.value.name, { toneType: 'none'}).replaceAll(" ", "");
