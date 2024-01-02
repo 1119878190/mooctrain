@@ -8,6 +8,8 @@ public enum BusinessExceptionEnum {
 
     MEMBER_MOBILE_CODE_ERROR("短信验证码错误"),
 
+    BUSINESS_TRAIN_CODE_UNIQUE_ERROR("车次编号已存在"),
+
     ;
     private String desc;
 

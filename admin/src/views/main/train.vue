@@ -242,6 +242,7 @@ export default defineComponent({
       });
     };
 
+    // 生成座位
     const genSeat = (record) => {
       loading.value = true;
       axios.get("/business/admin/train/gen-seat/" + record.code).then((response) => {

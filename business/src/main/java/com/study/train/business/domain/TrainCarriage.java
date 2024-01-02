@@ -2,6 +2,9 @@ package com.study.train.business.domain;
 
 import java.util.Date;
 
+/**、
+ * 火车车厢
+ */
 public class TrainCarriage {
     private Long id;
 
