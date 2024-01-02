@@ -29,7 +29,7 @@
            ok-text="确认" cancel-text="取消">
     <a-form :model="trainStation" :label-col="{span: 4}" :wrapper-col="{ span: 20 }">
       <a-form-item label="车次编号">
-<!--        <train-select-view v-model="trainStation.trainCode"></train-select-view>-->
+        <train-select-view v-model="trainStation.trainCode"></train-select-view>
       </a-form-item>
       <a-form-item label="站序">
         <a-input v-model:value="trainStation.index" />
@@ -62,13 +62,13 @@ import {defineComponent, ref, onMounted, watch} from 'vue';
 import {notification} from "ant-design-vue";
 import axios from "axios";
 import {pinyin} from "pinyin-pro";
-// import TrainSelectView from "@/components/train-select";
+import TrainSelectView from "@/components/train-select";
 import StationSelectView from "@/components/station-select";
 import dayjs from 'dayjs';
 
 export default defineComponent({
   name: "train-station-view",
-  components: {StationSelectView},
+  components: {StationSelectView,TrainSelectView},
   setup() {
     const visible = ref(false);
     let trainStation = ref({
