@@ -30,7 +30,7 @@ public class JobController {
     private SchedulerFactoryBean schedulerFactoryBean;
 
     /**
-     * 开始执行
+     * 手动执行一次
      *
      * @param cronJobReq
      * @return
