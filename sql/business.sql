@@ -93,6 +93,7 @@ create table `daily_train` (
   unique key `date_code_unique` (`date`, `code`)
 ) engine=innodb default charset=utf8mb4 comment='每日车次';
 
+-- 每日车站
 drop table if exists `daily_train_station`;
 create table `daily_train_station` (
   `id` bigint not null comment 'id',
