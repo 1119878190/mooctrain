@@ -74,6 +74,7 @@ create table `train_seat` (
   primary key (`id`)
 ) engine=innodb default charset=utf8mb4 comment='座位';
 
+-- 每日车次
 drop table if exists `daily_train`;
 create table `daily_train` (
   `id` bigint not null comment 'id',

@@ -39,7 +39,17 @@ const routes = [
           component: () => import('../views/main/batch/job.vue'),
         }
       ]
-    }]
+    },
+      {
+        path: 'business/',
+        children:[
+          {
+            path: 'daily-train',
+            component: () => import('../views/main/business/daily-train.vue'),
+          }
+        ]
+      }
+    ]
   }, {
     path: '',
     redirect: '/welcome'
