@@ -130,6 +130,7 @@ create table `daily_train_carriage` (
   unique key `date_train_code_index_unique` (`date`, `train_code`, `index`)
 ) engine=innodb default charset=utf8mb4 comment='每日车厢';
 
+-- 每日座位
 drop table if exists `daily_train_seat`;
 create table `daily_train_seat` (
   `id` bigint not null comment 'id',
