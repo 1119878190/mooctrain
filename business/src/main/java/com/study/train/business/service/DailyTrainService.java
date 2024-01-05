@@ -19,7 +19,6 @@ import com.study.train.common.util.SnowUtil;
 import jakarta.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,8 +36,10 @@ public class DailyTrainService {
     @Resource
     private DailyTrainMapper dailyTrainMapper;
 
-    @Autowired
+    @Resource
     private TrainService trainService;
+    @Resource
+    private DailyTrainStationService dailyTrainStationService;
 
 
     /**
@@ -131,6 +132,10 @@ public class DailyTrainService {
         dailyTrain.setUpdateTime(now);
         dailyTrain.setDate(date);
         dailyTrainMapper.insert(dailyTrain);
+
+        // 生成该车次的车站数据
+        dailyTrainStationService.genDaily(date,train.getCode());
+
 
         LOG.info("生成日期【{}】车次【{}】的信息结束", DateUtil.formatDate(date), train.getCode());
     }
