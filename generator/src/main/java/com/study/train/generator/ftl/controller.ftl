@@ -19,12 +19,7 @@ public class ${Domain}Controller {
     @Resource
     private ${Domain}Service ${domain}Service;
 
-    /**
-     * 保存乘车人信息
-     *
-     * @param req
-     * @return
-     */
+
     @PostMapping("/save")
     public CommonResp<Object> save(@Valid @RequestBody ${Domain}SaveReq req) {
         ${domain}Service.save(req);

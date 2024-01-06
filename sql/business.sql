@@ -147,6 +147,7 @@ create table `daily_train_seat` (
   primary key (`id`)
 ) engine=innodb default charset=utf8mb4 comment='每日座位';
 
+-- 车次余票信息
 drop table if exists `daily_train_ticket`;
 create table `daily_train_ticket` (
   `id` bigint not null comment 'id',
