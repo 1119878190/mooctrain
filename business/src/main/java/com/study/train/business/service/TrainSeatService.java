@@ -6,9 +6,7 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
-import com.study.train.business.domain.TrainCarriage;
-import com.study.train.business.domain.TrainSeat;
-import com.study.train.business.domain.TrainSeatExample;
+import com.study.train.business.domain.*;
 import com.study.train.business.enums.SeatColEnum;
 import com.study.train.business.mapper.TrainSeatMapper;
 import com.study.train.business.req.TrainSeatQueryReq;
@@ -129,6 +127,14 @@ public class TrainSeatService {
                 }
             }
         }
+    }
+
+    public List<TrainSeat> selectByTrainCode(String trainCode) {
+        TrainSeatExample trainSeatExample = new TrainSeatExample();
+        trainSeatExample.setOrderByClause("`id` asc");
+        TrainSeatExample.Criteria criteria = trainSeatExample.createCriteria();
+        criteria.andTrainCodeEqualTo(trainCode);
+        return trainSeatMapper.selectByExample(trainSeatExample);
     }
 
 }
