@@ -1,29 +1,27 @@
 <template>
   <p>
-    <a-button type="primary" @click="handleQuery()">刷新</a-button>
-    <a-button type="primary" @click="onAdd">新增</a-button>
+    <a-space>
+      <a-button type="primary" @click="handleQuery()">刷新</a-button>
+      <a-button type="primary" @click="onAdd">新增</a-button>
+    </a-space>
   </p>
   <a-table :dataSource="passengers"
            :columns="columns"
            :pagination="pagination"
-           v-on:change="handleTableChange"
+           @change="handleTableChange"
            :loading="loading">
-
-
     <template #bodyCell="{ column, record }">
-      <!-- 操作列   -->
       <template v-if="column.dataIndex === 'operation'">
-       <a-space>
-         <a-popconfirm
-             title="删除后不可恢复，确认删除?"
-             @confirm="onDelete(record)"
-             ok-text="确认" cancel-text="取消">
-           <a style="color: red">删除</a>
-         </a-popconfirm>
-         <a @click="onEdit(record)">编辑</a>
-       </a-space>
+        <a-space>
+          <a-popconfirm
+              title="删除后不可恢复，确认删除?"
+              @confirm="onDelete(record)"
+              ok-text="确认" cancel-text="取消">
+            <a style="color: red">删除</a>
+          </a-popconfirm>
+          <a @click="onEdit(record)">编辑</a>
+        </a-space>
       </template>
-    <!--   类型列   -->
       <template v-else-if="column.dataIndex === 'type'">
         <span v-for="item in PASSENGER_TYPE_ARRAY" :key="item.code">
           <span v-if="item.code === record.type">
@@ -32,7 +30,6 @@
         </span>
       </template>
     </template>
-
   </a-table>
   <a-modal v-model:visible="visible" title="乘车人" @ok="handleOk"
            ok-text="确认" cancel-text="取消">
@@ -55,18 +52,15 @@
 </template>
 
 <script>
-import {defineComponent, ref, onMounted} from 'vue';
-import axios from "axios";
+import { defineComponent, ref, onMounted } from 'vue';
 import {notification} from "ant-design-vue";
-
-
+import axios from "axios";
 
 export default defineComponent({
   name: "passenger-view",
   setup() {
-
     const PASSENGER_TYPE_ARRAY = window.PASSENGER_TYPE_ARRAY;
-
+    const visible = ref(false);
     let passenger = ref({
       id: undefined,
       memberId: undefined,
@@ -76,19 +70,14 @@ export default defineComponent({
       createTime: undefined,
       updateTime: undefined,
     });
-
-    const visible = ref(false);
-    // 表单数据
     const passengers = ref([]);
     // 分页的三个属性名是固定的
     const pagination = ref({
       total: 0,
       current: 1,
-      pageSize: 2,
+      pageSize: 10,
     });
-    // loading效果
-    let loading = ref(false)
-
+    let loading = ref(false);
     const columns = [
       {
         title: '姓名',
@@ -112,12 +101,14 @@ export default defineComponent({
     ];
 
     const onAdd = () => {
-      passenger.value = {}
+
+      passenger.value = {};
       visible.value = true;
+
     };
 
     const onEdit = (record) => {
-      passenger.value = window.Tool.copy(record)
+      passenger.value = window.Tool.copy(record);
       visible.value = true;
     };
 
@@ -136,24 +127,22 @@ export default defineComponent({
       });
     };
 
-    // 确认新增
     const handleOk = () => {
-      axios.post("/member/passenger/save",passenger.value).then((response) =>{
-        const data = response.data;
-        if (data.success){
+      axios.post("/member/passenger/save", passenger.value).then((response) => {
+        let data = response.data;
+        if (data.success) {
           notification.success({description: "保存成功！"});
-          visible.value = false;
-          handleQuery({
+          visible.value = false; handleQuery({
             page: pagination.value.current,
             size: pagination.value.pageSize
           });
-        }else {
+
+        } else {
           notification.error({description: data.message});
         }
-      })
+      });
     };
 
-    // 列表查询
     const handleQuery = (param) => {
       if (!param) {
         param = {
@@ -172,7 +161,6 @@ export default defineComponent({
         let data = response.data;
         if (data.success) {
           passengers.value = data.content.list;
-          pagination.value.total = data.content.total;
           // 设置分页控件的值
           pagination.value.current = param.page;
           pagination.value.total = data.content.total;
@@ -183,11 +171,12 @@ export default defineComponent({
     };
 
     const handleTableChange = (pagination) => {
+      // console.log("看看自带的分页参数都有啥：" + pagination);
       handleQuery({
         page: pagination.current,
         size: pagination.pageSize
       });
-    }
+    };
 
     onMounted(() => {
       handleQuery({
@@ -197,20 +186,19 @@ export default defineComponent({
     });
 
     return {
-      onAdd,
-      visible,
-      handleOk,
-      passengers,
+      PASSENGER_TYPE_ARRAY,
       passenger,
-      columns,
+      visible,
+      passengers,
       pagination,
+      columns,
       handleTableChange,
       handleQuery,
       loading,
+      onAdd,
+      handleOk,
       onEdit,
-      onDelete,
-      PASSENGER_TYPE_ARRAY
-
+      onDelete
     };
   },
 });
