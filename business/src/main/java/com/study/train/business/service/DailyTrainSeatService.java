@@ -106,7 +106,7 @@ public class DailyTrainSeatService {
                 .andTrainCodeEqualTo(trainCode);
         dailyTrainSeatMapper.deleteByExample(dailyTrainSeatExample);
 
-        // 默认每日车次座位的售卖情况为0000   0的个位为火车车站-1
+        // 默认每日车次座位的售卖情况为0000   0的个树为火车车站-1 如从南京-上海 一共四个站 那么就是默认为000三个0
         List<TrainStation> stationList = trainStationService.selectByTrainCode(trainCode);
         String sell = StrUtil.fillBefore("", '0', stationList.size() - 1);
 
