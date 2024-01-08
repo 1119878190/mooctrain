@@ -175,6 +175,7 @@ create table `daily_train_ticket` (
   unique key `date_train_code_start_end_unique` (`date`, `train_code`, `start`, `end`)
 ) engine=innodb default charset=utf8mb4 comment='余票信息';
 
+-- 确认订单
 drop table if exists `confirm_order`;
 create table `confirm_order` (
   `id` bigint not null comment 'id',
