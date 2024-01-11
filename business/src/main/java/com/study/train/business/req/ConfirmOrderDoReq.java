@@ -55,7 +55,7 @@ public class ConfirmOrderDoReq {
      *     //   passengerName: "张三",
      *     //   passengerIdCard: "12323132132",
      *     //   seatTypeCode: "1",
-     *     //   seat: "C1"
+     *     //   seat: "C1"  如果没有选座 那么seat为空
      *     // }
      *
      *     [ConfirmOrderTicketReq]
