@@ -23,7 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 /**
- * 乘车人 业务层
+ * 座位 业务层
  */
 @Service
 public class TrainSeatService {

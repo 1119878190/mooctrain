@@ -33,7 +33,7 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * 乘车人 业务层
+ * 每日车次售票详情 业务层
  */
 @Service
 public class DailyTrainTicketService {

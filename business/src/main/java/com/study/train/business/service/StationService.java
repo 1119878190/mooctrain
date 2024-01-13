@@ -24,7 +24,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 /**
- * 乘车人 业务层
+ * 车站 业务层
  */
 @Service
 public class StationService {

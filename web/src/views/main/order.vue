@@ -383,12 +383,12 @@ export default defineComponent({
       }).then((response) => {
         let data = response.data;
         if (data.success) {
-          // notification.success({description: "下单成功！"});
-          visible.value = false;
-          imageCodeModalVisible.value = false;
-          lineModalVisible.value = true;
-          confirmOrderId.value = data.content;
-          queryLineCount();
+          notification.success({description: "下单成功！"});
+          // visible.value = false;
+          // imageCodeModalVisible.value = false;
+          // lineModalVisible.value = true;
+          // confirmOrderId.value = data.content;
+          // queryLineCount();
         } else {
           notification.error({description: data.message});
         }

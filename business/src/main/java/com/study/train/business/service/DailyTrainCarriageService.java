@@ -28,7 +28,7 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * 乘车人 业务层
+ * 每日车次车厢 业务层
  */
 @Service
 public class DailyTrainCarriageService {
