@@ -7,9 +7,7 @@ import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
-import com.study.train.business.domain.ConfirmOrder;
-import com.study.train.business.domain.ConfirmOrderExample;
-import com.study.train.business.domain.DailyTrainTicket;
+import com.study.train.business.domain.*;
 import com.study.train.business.enums.ConfirmOrderStatusEnum;
 import com.study.train.business.enums.SeatColEnum;
 import com.study.train.business.enums.SeatTypeEnum;
@@ -43,6 +41,10 @@ public class ConfirmOrderService {
 
     @Resource
     private DailyTrainTicketService dailyTrainTicketService;
+    @Resource
+    private DailyTrainCarriageService dailyTrainCarriageService;
+    @Resource
+    private DailyTrainSeatService dailyTrainSeatService;
 
     /**
      * 新增或保存
@@ -130,11 +132,11 @@ public class ConfirmOrderService {
         // 计算相对第一个座位的偏移值
         // 比如选择的是C1,D2，则偏移值是：[0,5]
         // 比如选择的是A1,B1,C1，则偏移值是：[0,1,2]
-        ConfirmOrderTicketReq confirmOrderTicketReq = tickets.get(0);
-        if (StrUtil.isNotBlank(confirmOrderTicketReq.getSeat())){
+        ConfirmOrderTicketReq ticketReq0 = tickets.get(0);
+        if (StrUtil.isNotBlank(ticketReq0.getSeat())) {
             LOG.info("本次购票有选座");
             // 查询选座类型对应的一排多少个座位 例如 一等座为四个 二等座为五个
-            List<SeatColEnum> colEnumList = SeatColEnum.getColsByType(confirmOrderTicketReq.getSeatTypeCode());
+            List<SeatColEnum> colEnumList = SeatColEnum.getColsByType(ticketReq0.getSeatTypeCode());
             LOG.info("本次选座的座位类型包含的列：{}", colEnumList);
 
             // 组成和前端两排选座一样的列表，用于作参照的座位列表，例：referSeatList = {A1, C1, D1, F1, A2, C2, D2, F2}
@@ -160,16 +162,53 @@ public class ConfirmOrderService {
             }
             LOG.info("计算得到所有座位的相对第一个座位的偏移值：{}", offsetList);
 
-
-
-        }else {
+            getSeat(date,
+                    trainCode,
+                    ticketReq0.getSeatTypeCode(),
+                    ticketReq0.getSeat().split("")[0], // 从A1得到A
+                    offsetList
+            );
+        } else {
             LOG.info("本次购票没有选座");
+            for (ConfirmOrderTicketReq ticketReq : tickets) {
+                getSeat(date,
+                        trainCode,
+                        ticketReq.getSeatTypeCode(),
+                        null,
+                        null
+                );
+            }
         }
 
 
     }
 
-    private  void reduceTickets(List<ConfirmOrderTicketReq> tickets, DailyTrainTicket dailyTrainTicket) {
+
+    /**
+     * 获取作为
+     *
+     * @param date       车次日期
+     * @param trainCode  车次code
+     * @param seatType   作为类型
+     * @param column     座位列，若选择需要第一个选择的座位列
+     * @param offsetList 偏移量，相对于第一个座位的偏移
+     */
+    private void getSeat(Date date, String trainCode, String seatType, String column, List<Integer> offsetList) {
+        List<DailyTrainCarriage> carriageList = dailyTrainCarriageService.selectBySeatType(date, trainCode, seatType);
+        LOG.info("共查出:{}个复符合条件的车厢", carriageList.size());
+
+        // 一个车厢一个车厢的获取座位数据
+        for (DailyTrainCarriage dailyTrainCarriage : carriageList) {
+            List<DailyTrainSeat> seatList = dailyTrainSeatService.selectByCarriage(date, trainCode, dailyTrainCarriage.getIndex());
+            LOG.info("车厢{}的座位数：{}", dailyTrainCarriage.getIndex(), seatList.size());
+
+        }
+
+
+    }
+
+
+    private void reduceTickets(List<ConfirmOrderTicketReq> tickets, DailyTrainTicket dailyTrainTicket) {
         for (ConfirmOrderTicketReq ticket : tickets) {
             String seatTypeCode = ticket.getSeatTypeCode();
             SeatTypeEnum seatTypeEnum = SeatTypeEnum.getEnumByCode(seatTypeCode);
