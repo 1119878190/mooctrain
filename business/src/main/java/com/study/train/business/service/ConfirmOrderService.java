@@ -2,6 +2,7 @@ package com.study.train.business.service;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DateTime;
+import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSONObject;
@@ -166,7 +167,9 @@ public class ConfirmOrderService {
                     trainCode,
                     ticketReq0.getSeatTypeCode(),
                     ticketReq0.getSeat().split("")[0], // 从A1得到A
-                    offsetList
+                    offsetList,
+                    dailyTrainTicket.getStartIndex(), //  用户买的上车站在这个车次车站中的索引
+                    dailyTrainTicket.getEndIndex()  // 用户买的下车站在这个车次车站中的索引
             );
         } else {
             LOG.info("本次购票没有选座");
@@ -175,7 +178,9 @@ public class ConfirmOrderService {
                         trainCode,
                         ticketReq.getSeatTypeCode(),
                         null,
-                        null
+                        null,
+                        dailyTrainTicket.getStartIndex(),
+                        dailyTrainTicket.getEndIndex()
                 );
             }
         }
@@ -185,15 +190,18 @@ public class ConfirmOrderService {
 
 
     /**
-     * 获取作为
+     * 获取座位
      *
      * @param date       车次日期
      * @param trainCode  车次code
      * @param seatType   作为类型
      * @param column     座位列，若选择需要第一个选择的座位列
      * @param offsetList 偏移量，相对于第一个座位的偏移
+     * @param startIndex 用户买的上车站在这个车次车站中的索引
+     * @param endIndex   用户买的下车站在这个车次车站中的索引
      */
-    private void getSeat(Date date, String trainCode, String seatType, String column, List<Integer> offsetList) {
+    private void getSeat(Date date, String trainCode, String seatType, String column, List<Integer> offsetList,
+                         Integer startIndex, Integer endIndex) {
         List<DailyTrainCarriage> carriageList = dailyTrainCarriageService.selectBySeatType(date, trainCode, seatType);
         LOG.info("共查出:{}个复符合条件的车厢", carriageList.size());
 
@@ -201,6 +209,68 @@ public class ConfirmOrderService {
         for (DailyTrainCarriage dailyTrainCarriage : carriageList) {
             List<DailyTrainSeat> seatList = dailyTrainSeatService.selectByCarriage(date, trainCode, dailyTrainCarriage.getIndex());
             LOG.info("车厢{}的座位数：{}", dailyTrainCarriage.getIndex(), seatList.size());
+            for (DailyTrainSeat dailyTrainSeat : seatList) {
+
+                // 查看当前座位的column是否符合用户选座的指定列
+                String col = dailyTrainSeat.getCol();
+
+
+                // 根据座位销售情况  计算某座位在用户的乘车区间内内是否可卖
+                boolean isChoose = calSell(dailyTrainSeat, startIndex, endIndex);
+                if (isChoose){
+                    LOG.info("选中座位");
+
+
+
+                }else {
+
+                }
+
+            }
+        }
+
+
+    }
+
+
+    /**
+     * 根据座位销售情况  计算某座位在用户的乘车区间内内是否可卖
+     *
+     * @param dailyTrainSeat 需要被判断的座位
+     * @param startIndex     用户买的上车站在这个车次车站中的索引
+     * @param endIndex       用户买的下车站在这个车次车站中的索引
+     */
+    private boolean calSell(DailyTrainSeat dailyTrainSeat, Integer startIndex, Integer endIndex) {
+        //  sell字段说明： 1表示两个站已经被售卖  0表示两个站之间没有被售卖  例如10000 表示第零站到第一站的票以卖
+
+        // 座位售卖情况  这里以两种情况为列  00001, 00000
+        String sell = dailyTrainSeat.getSell();
+        //  000, 000
+        String sellPart = sell.substring(startIndex, endIndex);
+        if (Integer.parseInt(sellPart) > 0) {
+            LOG.info("座位{}在本次车站区间{}~{}已售过票，不可选中该座位", dailyTrainSeat.getCarriageSeatIndex(), startIndex, endIndex);
+            return false;
+        } else {
+            LOG.info("座位{}在本次车站区间{}~{}未售过票，可选中该座位", dailyTrainSeat.getCarriageSeatIndex(), startIndex, endIndex);
+            // 将当前座位售卖情况改为1    111,   111
+            String curSell = sellPart.replace('0', '1');
+            // 这里填充是为了 整个sell的个数跟车次所经过的所有站的个数-1一致
+            // 在前面填充   0111,  0111
+            curSell = StrUtil.fillBefore(curSell, '0', endIndex);
+            // 在后面填充   01110, 01110
+            curSell = StrUtil.fillAfter(curSell, '0', sell.length());
+
+            // 当前区间售票信息curSell 01110与库里的已售信息sell 00001按位与，即可得到该座位卖出此票后的售票详情
+            // 15(01111), 14(01110 = 01110|00000)
+            int newSellInt = NumberUtil.binaryToInt(curSell) | NumberUtil.binaryToInt(sell);
+            //  1111,  1110
+            String newSell = NumberUtil.getBinaryStr(newSellInt);
+            // 01111, 01110
+            newSell = StrUtil.fillBefore(newSell, '0', sell.length());
+            LOG.info("座位{}被选中，原售票信息：{}，车站区间：{}~{}，即：{}，最终售票信息：{}"
+                    , dailyTrainSeat.getCarriageSeatIndex(), sell, startIndex, endIndex, curSell, newSell);
+            dailyTrainSeat.setSell(newSell);
+            return true;
 
         }
 
@@ -208,6 +278,12 @@ public class ConfirmOrderService {
     }
 
 
+    /**
+     * 预减余票
+     *
+     * @param tickets
+     * @param dailyTrainTicket
+     */
     private void reduceTickets(List<ConfirmOrderTicketReq> tickets, DailyTrainTicket dailyTrainTicket) {
         for (ConfirmOrderTicketReq ticket : tickets) {
             String seatTypeCode = ticket.getSeatTypeCode();
