@@ -47,6 +47,8 @@ public class ConfirmOrderService {
     private DailyTrainCarriageService dailyTrainCarriageService;
     @Resource
     private DailyTrainSeatService dailyTrainSeatService;
+    @Resource
+    private AfterConfirmOrderService afterConfirmOrderService;
 
     /**
      * 新增或保存
@@ -189,6 +191,20 @@ public class ConfirmOrderService {
             }
         }
 
+        LOG.info("最终选座：{}", finalSeatList);
+
+
+        // 选中座位后事务处理：
+        // 座位表修改售卖情况sell；
+        // 余票详情表修改余票；
+        // 为会员增加购票记录
+        // 更新确认订单为成功
+        try {
+            afterConfirmOrderService.afterDoConfirm(finalSeatList);
+        } catch (Exception e) {
+            LOG.error("保存购票信息失败", e);
+            throw new BusinessException(BusinessExceptionEnum.CONFIRM_ORDER_EXCEPTION);
+        }
 
     }
 
@@ -202,13 +218,13 @@ public class ConfirmOrderService {
      * 选座(多个)：   便利每节车厢的每个座位  找到座位的列为选择的第一个offset的值  然后更具偏移值offsetList  判断剩余的是否符合条件
      *
      * @param finalSeatList 最终选座结果
-     * @param date       车次日期
-     * @param trainCode  车次code
-     * @param seatType   作为类型
-     * @param column     座位列，若选择需要第一个选择的座位列
-     * @param offsetList 偏移量，相对于第一个座位的偏移
-     * @param startIndex 用户买的上车站在这个车次车站中的索引
-     * @param endIndex   用户买的下车站在这个车次车站中的索引
+     * @param date          车次日期
+     * @param trainCode     车次code
+     * @param seatType      作为类型
+     * @param column        座位列，若选择需要第一个选择的座位列
+     * @param offsetList    偏移量，相对于第一个座位的偏移
+     * @param startIndex    用户买的上车站在这个车次车站中的索引
+     * @param endIndex      用户买的下车站在这个车次车站中的索引
      */
     private void getSeat(List<DailyTrainSeat> finalSeatList, Date date, String trainCode, String seatType, String column, List<Integer> offsetList,
                          Integer startIndex, Integer endIndex) {
@@ -229,7 +245,7 @@ public class ConfirmOrderService {
 
                 // 无选座的情况下，同一节车厢会循环多次，故判断当前座位不能被选中过
                 boolean alreadyChooseFlag = false;
-                for (DailyTrainSeat finalSeat : finalSeatList){
+                for (DailyTrainSeat finalSeat : finalSeatList) {
                     if (finalSeat.getId().equals(dailyTrainSeat.getId())) {
                         alreadyChooseFlag = true;
                         break;
