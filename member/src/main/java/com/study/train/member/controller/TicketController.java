@@ -2,6 +2,7 @@ package com.study.train.member.controller;
 
 
 
+import com.study.train.common.req.MemberTicketReq;
 import com.study.train.common.resp.CommonResp;
 import com.study.train.common.resp.PageResp;
 import com.study.train.member.req.TicketQueryReq;
@@ -21,7 +22,7 @@ public class TicketController {
 
 
     @PostMapping("/save")
-    public CommonResp<Object> save(@Valid @RequestBody TicketSaveReq req) {
+    public CommonResp<Object> save(@Valid @RequestBody MemberTicketReq req) throws Exception {
         ticketService.save(req);
         return new CommonResp<>();
     }
