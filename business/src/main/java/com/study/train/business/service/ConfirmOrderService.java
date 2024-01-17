@@ -257,7 +257,7 @@ public class ConfirmOrderService {
                 }
 
                 // 查看当前座位的column是否符合用户选座的指定列
-                if (StrUtil.isNotBlank(col)) {
+                if (StrUtil.isBlank(column)) {
                     LOG.info("无选座");
                 } else {
                     if (!column.equals(col)) {
