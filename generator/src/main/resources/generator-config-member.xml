@@ -23,9 +23,9 @@
 
         <!-- 配置数据源，需要根据自己的项目修改 -->
         <jdbcConnection driverClass="com.mysql.cj.jdbc.Driver"
-                        connectionURL="jdbc:mysql://192.168.1.21:3306/train?serverTimezone=Asia/Shanghai"
+                        connectionURL="jdbc:mysql://172.30.6.151:3306/train?serverTimezone=Asia/Shanghai"
                         userId="root"
-                        password="17767620515lxlsh">
+                        password="Iamzqykj1!">
         </jdbcConnection>
 
         <!-- domain类的位置 targetProject是相对pom.xml的路径-->
@@ -42,7 +42,8 @@
                              type="XMLMAPPER"/>
 
         <!--    需要生成的表名 方法名    -->
-        <table tableName="member" domainObjectName="Member"/>
+<!--        <table tableName="member" domainObjectName="Member"/>-->
 <!--        <table tableName="passenger" domainObjectName="Passenger"/>-->
+        <table tableName="ticket" domainObjectName="Ticket"/>
     </context>
 </generatorConfiguration>
