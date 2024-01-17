@@ -2,7 +2,7 @@
   <a-layout-sider width="200" style="background: #fff">
     <a-menu
         v-model:selectedKeys="selectedKeys"
-        :openKeys="['batch', 'base']"
+        :openKeys="['batch', 'base','member','business']"
         mode="inline"
         :style="{ height: '100%', borderRight: 0 }"
     >
@@ -38,7 +38,7 @@
         </template>
         <a-menu-item key="/business/confirm-order">
           <router-link to="/business/confirm-order">
-            <MenuUnfoldOutlined /> &nbsp; 订单信息
+            <user-outlined /> &nbsp; 订单信息
           </router-link>
         </a-menu-item>
         <a-menu-item key="/business/daily-train-ticket">
