@@ -19,7 +19,7 @@ public class TestController {
     }
 
 
-    @GetMapping("/nacosTest")
+    @GetMapping("/hello")
     public String nacosTest() {
         System.out.println(nacosTest);
         return nacosTest;
