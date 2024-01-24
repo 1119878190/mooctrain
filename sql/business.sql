@@ -193,6 +193,7 @@ create table `confirm_order` (
   index `date_train_code_index` (`date`, `train_code`)
 ) engine=innodb default charset=utf8mb4 comment='确认订单';
 
+--seata undolog
 CREATE TABLE `undo_log` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `branch_id` bigint(20) NOT NULL,

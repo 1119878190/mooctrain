@@ -12,6 +12,8 @@ import com.study.train.business.req.ConfirmOrderTicketReq;
 import com.study.train.common.context.LoginMemberContext;
 import com.study.train.common.req.MemberTicketReq;
 import com.study.train.common.resp.CommonResp;
+import io.seata.core.context.RootContext;
+import io.seata.spring.annotation.GlobalTransactional;
 import jakarta.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,8 +52,10 @@ public class AfterConfirmOrderService {
      * @param tickets          前端传过来的买票的用户信息
      * @param confirmOrder     订单信息
      */
-    @Transactional
+//    @Transactional
+    @GlobalTransactional
     public void afterDoConfirm(DailyTrainTicket dailyTrainTicket, List<DailyTrainSeat> finalSeatList, List<ConfirmOrderTicketReq> tickets, ConfirmOrder confirmOrder) {
+        LOG.info("seata全局事务ID: {}", RootContext.getXID());
         for (int j = 0; j < finalSeatList.size(); j++) {
             DailyTrainSeat dailyTrainSeat = finalSeatList.get(j);
             DailyTrainSeat seatForUpdate = new DailyTrainSeat();
