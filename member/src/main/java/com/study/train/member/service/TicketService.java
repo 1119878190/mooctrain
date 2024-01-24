@@ -48,9 +48,9 @@ public class TicketService {
         ticket.setUpdateTime(now);
         ticketMapper.insert(ticket);
 
-        if (1 == 1) {
-            throw new RuntimeException("模拟失败");
-        }
+//        if (1 == 1) {
+//            throw new RuntimeException("模拟失败");
+//        }
     }
 
 
