@@ -23,7 +23,7 @@ public class ControllerExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public CommonResp exceptionHandler(Exception e) throws Exception {
-        LOGGER.info("seata全局事务ID: {}", RootContext.getXID());
+//        LOGGER.info("seata全局事务ID: {}", RootContext.getXID());
          // 如果是在一次全局事务里出异常了，就不要包装返回值，将异常抛给调用方，让调用方回滚事务
          if (StrUtil.isNotBlank(RootContext.getXID())) {
              throw e;
