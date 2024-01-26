@@ -7,6 +7,8 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+import com.alibaba.csp.sentinel.annotation.SentinelResource;
+import com.alibaba.csp.sentinel.slots.block.BlockException;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
@@ -104,7 +106,11 @@ public class ConfirmOrderService {
      * 买票提交订单
      *
      * @param req
+     *
+     *
+     * SentinelResource  blockHandler的值为熔断降级的方法名
      */
+    @SentinelResource(value = "doConfirm", blockHandler = "doConfirmBlock")
     public void doConfirm(ConfirmOrderDoReq req) {
 
         // 防止超卖 加分布式锁
@@ -437,6 +443,18 @@ public class ConfirmOrderService {
                 }
             }
         }
+    }
+
+
+
+    /**
+     * 降级方法，需包含限流方法的所有参数和BlockException参数
+     * @param req
+     * @param e
+     */
+    public void doConfirmBlock(ConfirmOrderDoReq req, BlockException e) {
+        LOG.info("购票请求被限流：{}", req);
+        throw new BusinessException(BusinessExceptionEnum.CONFIRM_ORDER_FLOW_EXCEPTION);
     }
 
 
