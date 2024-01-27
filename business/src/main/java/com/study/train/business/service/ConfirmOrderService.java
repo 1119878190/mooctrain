@@ -14,6 +14,7 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.study.train.business.domain.*;
 import com.study.train.business.enums.ConfirmOrderStatusEnum;
+import com.study.train.business.enums.RedisKeyPreEnum;
 import com.study.train.business.enums.SeatColEnum;
 import com.study.train.business.enums.SeatTypeEnum;
 import com.study.train.business.mapper.ConfirmOrderMapper;
@@ -128,7 +129,7 @@ public class ConfirmOrderService {
 
         // 防止超卖 加分布式锁
         // 锁的key为 同一天同一个车次
-        String key = DateUtil.formatDate(req.getDate()) + "-" + req.getTrainCode();
+        String key = RedisKeyPreEnum.CONFIRM_ORDER + "-" + DateUtil.formatDate(req.getDate()) + "-" + req.getTrainCode();
         RLock lock = redissonClient.getLock(key);
 
         try {

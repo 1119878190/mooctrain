@@ -10,6 +10,7 @@ import com.github.pagehelper.PageInfo;
 
 import com.study.train.business.domain.SkToken;
 import com.study.train.business.domain.SkTokenExample;
+import com.study.train.business.enums.RedisKeyPreEnum;
 import com.study.train.business.mapper.SkTokenMapper;
 import com.study.train.business.mapper.cust.SkTokenMapperCust;
 import com.study.train.business.req.SkTokenQueryReq;
@@ -18,6 +19,8 @@ import com.study.train.business.resp.SkTokenQueryResp;
 import com.study.train.common.resp.PageResp;
 import com.study.train.common.util.SnowUtil;
 import jakarta.annotation.Resource;
+import org.redisson.api.RAtomicLong;
+import org.redisson.api.RBucket;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.slf4j.Logger;
@@ -29,6 +32,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -132,7 +136,7 @@ public class SkTokenService {
 
 
         // 防止同一个人刷票  先获取令牌锁，再校验令牌余量，防止机器人抢票，lockKey就是令牌，用来表示【谁能做什么】的一个凭证
-        String lockKey = DateUtil.formatDate(date) + "-" + trainCode + "-" + memberId;
+        String lockKey = RedisKeyPreEnum.SK_TOKEN + "-" + DateUtil.formatDate(date) + "-" + trainCode + "-" + memberId;
         RLock lock = redissonClient.getLock(lockKey);
         // 不用等待  直接获取锁  获取不到则直接返回  ，获取到则设置5秒过期时间
         try {
@@ -148,13 +152,63 @@ public class SkTokenService {
         }
 
 
-        // 库存令牌约等于库存，令牌没有了，就不再卖票了，不需要再进入购票主流程去判断库存，判断令牌肯定比判断库存效率高
-        int updateCount = skTokenMapperCust.decrease(date, trainCode, 1);
-        if (updateCount > 0) {
-            return true;
+        // 将令牌数量放入redis缓存，提高速度
+        String skTokenCountKey = RedisKeyPreEnum.SK_TOKEN_COUNT + "-" + DateUtil.formatDate(date) + "-" + trainCode;
+        RBucket<Long> bucket = redissonClient.getBucket(skTokenCountKey);
+        Long skTokenCount = bucket.get();
+        if (Objects.nonNull(skTokenCount)) {
+            LOG.info("缓存中有该车次令牌大闸的key：{}", skTokenCountKey);
+            if (skTokenCount < 0) {
+                LOG.error("获取令牌失败：{}", skTokenCountKey);
+                return false;
+            } else {
+                LOG.info("获取令牌后，令牌余数：{}", skTokenCount);
+                // 续期
+                bucket.set(skTokenCount - 1, 60, TimeUnit.SECONDS);
+                if (skTokenCount % 5 == 0) {
+                    // 如果令牌数是5的倍数则更新数据库  ，没有每次都更新是为了考虑到性能
+                    skTokenMapperCust.decrease(date, trainCode, 5);
+                }
+                return true;
+            }
+
+
         } else {
-            return false;
+            // 从数据查询 然后放入缓存
+            LOG.info("缓存中没有该车次令牌大闸的key：{}", skTokenCountKey);
+            // 检查是否还有令牌
+            SkTokenExample skTokenExample = new SkTokenExample();
+            skTokenExample.createCriteria().andDateEqualTo(date).andTrainCodeEqualTo(trainCode);
+            List<SkToken> tokenCountList = skTokenMapper.selectByExample(skTokenExample);
+            if (CollUtil.isEmpty(tokenCountList)) {
+                LOG.info("找不到日期【{}】车次【{}】的令牌记录", DateUtil.formatDate(date), trainCode);
+                return false;
+            }
+            SkToken skToken = tokenCountList.get(0);
+            if (skToken.getCount() <= 0) {
+                LOG.info("日期【{}】车次【{}】的令牌余量为0", DateUtil.formatDate(date), trainCode);
+                return false;
+            }
+
+            // 令牌还有余量
+            // 令牌余数-1
+            Integer count = skToken.getCount() - 1;
+            skToken.setCount(count);
+            LOG.info("将该车次令牌大闸放入缓存中，key: {}， count: {}", skTokenCountKey, count);
+            // 不需要更新数据库，只要放缓存即可
+            bucket.set(Long.valueOf(count),60,TimeUnit.SECONDS);
+            // skTokenMapper.updateByPrimaryKey(skToken);
+            return true;
         }
+
+
+        // 库存令牌约等于库存，令牌没有了，就不再卖票了，不需要再进入购票主流程去判断库存，判断令牌肯定比判断库存效率高
+//        int updateCount = skTokenMapperCust.decrease(date, trainCode, 1);
+//        if (updateCount > 0) {
+//            return true;
+//        } else {
+//            return false;
+//        }
 
     }
 
