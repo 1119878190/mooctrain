@@ -208,6 +208,7 @@ CREATE TABLE `undo_log` (
   UNIQUE KEY `ux_undo_log` (`xid`,`branch_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
+--秒杀令牌
 drop table if exists `sk_token`;
 create table `sk_token` (
   `id` bigint not null comment 'id',
