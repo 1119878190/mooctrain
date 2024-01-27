@@ -35,9 +35,10 @@ public class BusinessApplication {
         LOGGER.info("项目启动成功，port:{}", port);
 
 
+        // 这里注释了  通过sentine-dashboard配置
         // 限流规则
-        initFlowRules();
-        LOGGER.info("已定义限流规则");
+//        initFlowRules();
+//        LOGGER.info("已定义限流规则");
     }
 
 
