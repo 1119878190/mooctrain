@@ -59,6 +59,8 @@ public class ConfirmOrderService {
     private AfterConfirmOrderService afterConfirmOrderService;
     @Autowired
     private RedissonClient redissonClient;
+    @Resource
+    private SkTokenService skTokenService;
 
     /**
      * 新增或保存
@@ -112,6 +114,17 @@ public class ConfirmOrderService {
      */
     @SentinelResource(value = "doConfirm", blockHandler = "doConfirmBlock")
     public void doConfirm(ConfirmOrderDoReq req) {
+
+
+        // 校验令牌数量
+         boolean validSkToken = skTokenService.validSkToken(req.getDate(), req.getTrainCode(), LoginMemberContext.getId());
+        if (validSkToken){
+            LOG.info("令牌校验通过");
+        }else {
+            LOG.info("令牌校验不通过");
+            throw new BusinessException(BusinessExceptionEnum.CONFIRM_ORDER_SK_TOKEN_FAIL);
+        }
+
 
         // 防止超卖 加分布式锁
         // 锁的key为 同一天同一个车次
