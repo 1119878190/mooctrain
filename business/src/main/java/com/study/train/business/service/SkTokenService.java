@@ -18,6 +18,8 @@ import com.study.train.business.resp.SkTokenQueryResp;
 import com.study.train.common.resp.PageResp;
 import com.study.train.common.util.SnowUtil;
 import jakarta.annotation.Resource;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,6 +50,8 @@ public class SkTokenService {
 
     @Resource
     private SkTokenMapperCust skTokenMapperCust;
+    @Autowired
+    private RedissonClient redissonClient;
 
     /**
      * 初始化
@@ -126,11 +130,29 @@ public class SkTokenService {
     public boolean validSkToken(Date date, String trainCode, Long memberId) {
         LOG.info("会员【{}】获取日期【{}】车次【{}】的令牌开始", memberId, DateUtil.formatDate(date), trainCode);
 
-        // 令牌约等于库存，令牌没有了，就不再卖票了，不需要再进入购票主流程去判断库存，判断令牌肯定比判断库存效率高
+
+        // 防止同一个人刷票  先获取令牌锁，再校验令牌余量，防止机器人抢票，lockKey就是令牌，用来表示【谁能做什么】的一个凭证
+        String lockKey = DateUtil.formatDate(date) + "-" + trainCode + "-" + memberId;
+        RLock lock = redissonClient.getLock(lockKey);
+        // 不用等待  直接获取锁  获取不到则直接返回  ，获取到则设置5秒过期时间
+        try {
+            boolean tryLock = lock.tryLock(0, 5, TimeUnit.SECONDS);
+            if (tryLock) {
+                LOG.info("恭喜，抢到令牌锁了！lockKey：{}", lockKey);
+            } else {
+                LOG.info("很遗憾，没抢到令牌锁！lockKey：{}", lockKey);
+                return false;
+            }
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
+
+        // 库存令牌约等于库存，令牌没有了，就不再卖票了，不需要再进入购票主流程去判断库存，判断令牌肯定比判断库存效率高
         int updateCount = skTokenMapperCust.decrease(date, trainCode, 1);
-        if (updateCount > 0){
+        if (updateCount > 0) {
             return true;
-        }else {
+        } else {
             return false;
         }
 
