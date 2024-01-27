@@ -74,6 +74,35 @@ public class ConfirmOrderDoReq {
      */
     private int lineNumber;
 
+
+    /**
+     * 验证码
+     */
+    @NotBlank(message = "【图片验证码】不能为空")
+    private String imageCode;
+
+    /**
+     * 图片验证码token
+     */
+    @NotBlank(message = "【图片验证码】参数非法")
+    private String imageCodeToken;
+
+    public String getImageCode() {
+        return imageCode;
+    }
+
+    public void setImageCode(String imageCode) {
+        this.imageCode = imageCode;
+    }
+
+    public String getImageCodeToken() {
+        return imageCodeToken;
+    }
+
+    public void setImageCodeToken(String imageCodeToken) {
+        this.imageCodeToken = imageCodeToken;
+    }
+
     public Long getMemberId() {
         return memberId;
     }

@@ -53,7 +53,7 @@
   <a-modal v-model:visible="visible" title="请核对以下信息"
            style="top: 50px; width: 800px"
            ok-text="确认" cancel-text="取消"
-           @ok="handleOk">
+           @ok="showFirstImageCodeModal">
     <div class="order-tickets">
       <a-row class="order-tickets-header" v-if="tickets.length > 0">
         <a-col :span="3">乘客</a-col>
@@ -105,39 +105,39 @@
     </div>
   </a-modal>
 
-<!--  &lt;!&ndash; 第二层验证码 后端 &ndash;&gt;-->
-<!--  <a-modal v-model:visible="imageCodeModalVisible" :title="null" :footer="null" :closable="false"-->
-<!--           style="top: 50px; width: 400px">-->
-<!--    <p style="text-align: center; font-weight: bold; font-size: 18px">-->
-<!--      使用服务端验证码削弱瞬时高峰<br/>-->
-<!--      防止机器人刷票-->
-<!--    </p>-->
-<!--    <p>-->
-<!--      <a-input v-model:value="imageCode" placeholder="图片验证码">-->
-<!--        <template #suffix>-->
-<!--          <img v-show="!!imageCodeSrc" :src="imageCodeSrc" alt="验证码" v-on:click="loadImageCode()"/>-->
-<!--        </template>-->
-<!--      </a-input>-->
-<!--    </p>-->
-<!--    <a-button type="danger" block @click="handleOk">输入验证码后开始购票</a-button>-->
-<!--  </a-modal>-->
+  <!-- 第二层验证码 后端 -->
+  <a-modal v-model:visible="imageCodeModalVisible" :title="null" :footer="null" :closable="false"
+           style="top: 50px; width: 400px">
+    <p style="text-align: center; font-weight: bold; font-size: 18px">
+      使用服务端验证码削弱瞬时高峰<br/>
+      防止机器人刷票
+    </p>
+    <p>
+      <a-input v-model:value="imageCode" placeholder="图片验证码">
+        <template #suffix>
+          <img v-show="!!imageCodeSrc" :src="imageCodeSrc" alt="验证码" v-on:click="loadImageCode()"/>
+        </template>
+      </a-input>
+    </p>
+    <a-button type="danger" block @click="handleOk">输入验证码后开始购票</a-button>
+  </a-modal>
 
-<!--  &lt;!&ndash; 第一层验证码 纯前端 &ndash;&gt;-->
-<!--  <a-modal v-model:visible="firstImageCodeModalVisible" :title="null" :footer="null" :closable="false"-->
-<!--           style="top: 50px; width: 400px">-->
-<!--    <p style="text-align: center; font-weight: bold; font-size: 18px">-->
-<!--      使用纯前端验证码削弱瞬时高峰<br/>-->
-<!--      减小后端验证码接口的压力-->
-<!--    </p>-->
-<!--    <p>-->
-<!--      <a-input v-model:value="firstImageCodeTarget" placeholder="验证码">-->
-<!--        <template #suffix>-->
-<!--          {{firstImageCodeSourceA}} + {{firstImageCodeSourceB}}-->
-<!--        </template>-->
-<!--      </a-input>-->
-<!--    </p>-->
-<!--    <a-button type="danger" block @click="validFirstImageCode">提交验证码</a-button>-->
-<!--  </a-modal>-->
+  <!-- 第一层验证码 纯前端 -->
+  <a-modal v-model:visible="firstImageCodeModalVisible" :title="null" :footer="null" :closable="false"
+           style="top: 50px; width: 400px">
+    <p style="text-align: center; font-weight: bold; font-size: 18px">
+      使用纯前端验证码削弱瞬时高峰<br/>
+      减小后端验证码接口的压力
+    </p>
+    <p>
+      <a-input v-model:value="firstImageCodeTarget" placeholder="验证码">
+        <template #suffix>
+          {{firstImageCodeSourceA}} + {{firstImageCodeSourceB}}
+        </template>
+      </a-input>
+    </p>
+    <a-button type="danger" block @click="validFirstImageCode">提交验证码</a-button>
+  </a-modal>
 
   <a-modal v-model:visible="lineModalVisible" title="排队购票" :footer="null" :maskClosable="false" :closable="false"
            style="top: 50px; width: 400px">
@@ -339,10 +339,10 @@ export default defineComponent({
     };
 
     const handleOk = () => {
-      // if (Tool.isEmpty(imageCode.value)) {
-      //   notification.error({description: '验证码不能为空'});
-      //   return;
-      // }
+      if (Tool.isEmpty(imageCode.value)) {
+        notification.error({description: '验证码不能为空'});
+        return;
+      }
 
       console.log("选好的座位：", chooseSeatObj.value);
 
@@ -383,9 +383,9 @@ export default defineComponent({
       }).then((response) => {
         let data = response.data;
         if (data.success) {
-          notification.success({description: "下单成功！"});
-          // visible.value = false;
-          // imageCodeModalVisible.value = false;
+          // notification.success({description: "下单成功！"});
+          visible.value = false;
+          imageCodeModalVisible.value = false;
           // lineModalVisible.value = true;
           // confirmOrderId.value = data.content;
           // queryLineCount();

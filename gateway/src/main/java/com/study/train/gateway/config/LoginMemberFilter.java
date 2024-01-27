@@ -27,7 +27,8 @@ public class LoginMemberFilter implements GlobalFilter, Ordered {
         if (path.contains("/admin")
                 || path.contains("/hello")
                 || path.contains("/member/member/login")
-                || path.contains("/member/member/sendCode")) {
+                || path.contains("/member/member/sendCode")
+                || path.contains("/business/kaptcha")) {
             LOGGER.info("不需要登录验证：{}", path);
             return chain.filter(exchange);
         } else {
