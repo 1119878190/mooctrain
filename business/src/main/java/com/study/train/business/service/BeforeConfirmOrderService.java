@@ -77,9 +77,12 @@ public class BeforeConfirmOrderService {
 
 
         // 发送MQ排队购票
-        req.setMemberId(memberId);
-        req.setLogId(MDC.get("LOG_ID"));
-        String reqJson = JSONObject.toJSONString(req);
+
+        ConfirmOrderMQDto confirmOrderMQDto = new ConfirmOrderMQDto();
+        confirmOrderMQDto.setDate(req.getDate());
+        confirmOrderMQDto.setTrainCode(req.getTrainCode());
+        confirmOrderMQDto.setLogId(MDC.get("LOG_ID"));
+        String reqJson = JSON.toJSONString(confirmOrderMQDto);
         LOG.info("排队购票，发送mq开始，消息：{}", reqJson);
         rocketMQTemplate.convertAndSend(RocketMQTopicEnum.CONFIRM_ORDER.getCode(), reqJson);
         LOG.info("排队购票，发送mq结束");

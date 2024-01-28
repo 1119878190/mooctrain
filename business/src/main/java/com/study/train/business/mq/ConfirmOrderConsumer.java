@@ -25,7 +25,7 @@ package com.study.train.business.mq;
      @Override
      public void onMessage(MessageExt messageExt) {
          byte[] body = messageExt.getBody();
-         ConfirmOrderDoReq req = JSON.parseObject(new String(body), ConfirmOrderDoReq.class);
+         ConfirmOrderMQDto req = JSON.parseObject(new String(body), ConfirmOrderMQDto.class);
          MDC.put("LOG_ID", req.getLogId());
          LOG.info("ROCKETMQ收到消息：{}", new String(body));
          confirmOrderService.doConfirm(req);
