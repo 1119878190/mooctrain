@@ -3,13 +3,11 @@ package com.study.train.business.service;
 
 import cn.hutool.core.date.DateTime;
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.study.train.business.domain.ConfirmOrder;
 import com.study.train.business.dto.ConfirmOrderMQDto;
 import com.study.train.business.enums.ConfirmOrderStatusEnum;
 import com.study.train.business.enums.RocketMQTopicEnum;
 import com.study.train.business.mapper.ConfirmOrderMapper;
-import com.study.train.business.mq.ConfirmOrderConsumer;
 import com.study.train.business.req.ConfirmOrderDoReq;
 import com.study.train.business.req.ConfirmOrderTicketReq;
 import com.study.train.common.context.LoginMemberContext;
@@ -39,7 +37,7 @@ public class BeforeConfirmOrderService {
     @Resource
     private RocketMQTemplate rocketMQTemplate;
 
-    public void beforeDoConfirm(ConfirmOrderDoReq req) {
+    public Long beforeDoConfirm(ConfirmOrderDoReq req) {
         Long memberId = LoginMemberContext.getMember().getId();
         // 校验令牌数量
         boolean validSkToken = skTokenService.validSkToken(req.getDate(), req.getTrainCode(), LoginMemberContext.getId());
@@ -86,6 +84,8 @@ public class BeforeConfirmOrderService {
         LOG.info("排队购票，发送mq开始，消息：{}", reqJson);
         rocketMQTemplate.convertAndSend(RocketMQTopicEnum.CONFIRM_ORDER.getCode(), reqJson);
         LOG.info("排队购票，发送mq结束");
+
+        return confirmOrder.getId();
     }
 
 }
