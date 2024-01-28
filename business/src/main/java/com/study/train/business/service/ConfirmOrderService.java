@@ -117,14 +117,7 @@ public class ConfirmOrderService {
     public void doConfirm(ConfirmOrderDoReq req) {
 
 
-        // 校验令牌数量
-         boolean validSkToken = skTokenService.validSkToken(req.getDate(), req.getTrainCode(), LoginMemberContext.getId());
-        if (validSkToken){
-            LOG.info("令牌校验通过");
-        }else {
-            LOG.info("令牌校验不通过");
-            throw new BusinessException(BusinessExceptionEnum.CONFIRM_ORDER_SK_TOKEN_FAIL);
-        }
+        // 校验令牌数量  解耦移至BeforeConfirm
 
 
         // 防止超卖 加分布式锁
@@ -151,21 +144,9 @@ public class ConfirmOrderService {
             String start = req.getStart();
             String end = req.getEnd();
 
-            // 保存确认订单表，初始状态
-            ConfirmOrder confirmOrder = new ConfirmOrder();
-            confirmOrder.setId(SnowUtil.getSnowflakeNextId());
-            confirmOrder.setCreateTime(now);
-            confirmOrder.setUpdateTime(now);
-            confirmOrder.setMemberId(LoginMemberContext.getId());
-            confirmOrder.setDate(date);
-            confirmOrder.setTrainCode(trainCode);
-            confirmOrder.setStart(start);
-            confirmOrder.setEnd(end);
-            confirmOrder.setDailyTrainTicketId(req.getDailyTrainTicketId());
-            confirmOrder.setStatus(ConfirmOrderStatusEnum.INIT.getCode());
+
             List<ConfirmOrderTicketReq> tickets = req.getTickets();
-            confirmOrder.setTickets(JSONObject.toJSONString(tickets));
-            confirmOrderMapper.insert(confirmOrder);
+
 
             // 查出余票记录，需要得到真实的库存
             DailyTrainTicket dailyTrainTicket = dailyTrainTicketService.selectByUnique(date, trainCode, start, end);
@@ -243,7 +224,22 @@ public class ConfirmOrderService {
             // 余票详情表修改余票；
             // 为会员增加购票记录
             // 更新确认订单为成功
-
+            // 取确认订单表的记录，同日期车次，状态是I，分页处理，每次取N条
+            ConfirmOrderExample confirmOrderExample = new ConfirmOrderExample();
+            ConfirmOrderExample.Criteria criteria = confirmOrderExample.createCriteria();
+            confirmOrderExample.setOrderByClause("id asc");
+            criteria.andDateEqualTo(req.getDate())
+                    .andTrainCodeEqualTo(req.getTrainCode())
+                    .andStatusEqualTo(ConfirmOrderStatusEnum.INIT.getCode())
+                    .andMemberIdEqualTo(req.getMemberId());
+            List<ConfirmOrder> list = confirmOrderMapper.selectByExampleWithBLOBs(confirmOrderExample);
+            ConfirmOrder confirmOrder;
+            if (CollUtil.isEmpty(list)){
+                LOG.info("找不到原始订单，结束");
+                return;
+            }else {
+                confirmOrder = list.get(0);
+            }
             afterConfirmOrderService.afterDoConfirm(dailyTrainTicket, finalSeatList, tickets, confirmOrder);
         } catch (Exception e) {
             LOG.error("保存购票信息失败", e);

@@ -4,6 +4,7 @@ package com.study.train.business.controller;
 import com.alibaba.csp.sentinel.annotation.SentinelResource;
 import com.alibaba.csp.sentinel.slots.block.BlockException;
 import com.study.train.business.req.ConfirmOrderDoReq;
+import com.study.train.business.service.BeforeConfirmOrderService;
 import com.study.train.business.service.ConfirmOrderService;
 import com.study.train.common.exception.BusinessExceptionEnum;
 import com.study.train.common.resp.CommonResp;
@@ -30,6 +31,8 @@ public class ConfirmOrderController {
     private ConfirmOrderService confirmOrderService;
     @Autowired
     private RedissonClient redissonClient;
+    @Resource
+    private BeforeConfirmOrderService beforeConfirmOrderService;
 
     @SentinelResource(value = "confirmOrderDo", blockHandler = "doConfirmBlock")
     @PostMapping("/do")
@@ -53,7 +56,7 @@ public class ConfirmOrderController {
             bucket.delete();
         }
 
-        confirmOrderService.doConfirm(req);
+        beforeConfirmOrderService.beforeDoConfirm(req);
         return new CommonResp<>();
     }
 
