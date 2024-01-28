@@ -56,6 +56,8 @@ public class SkTokenService {
     private SkTokenMapperCust skTokenMapperCust;
     @Autowired
     private RedissonClient redissonClient;
+    @Value("${spring.profiles.active}")
+    private String env;
 
     /**
      * 初始化
@@ -135,20 +137,23 @@ public class SkTokenService {
         LOG.info("会员【{}】获取日期【{}】车次【{}】的令牌开始", memberId, DateUtil.formatDate(date), trainCode);
 
 
-        // 防止同一个人刷票  先获取令牌锁，再校验令牌余量，防止机器人抢票，lockKey就是令牌，用来表示【谁能做什么】的一个凭证
-        String lockKey = RedisKeyPreEnum.SK_TOKEN + "-" + DateUtil.formatDate(date) + "-" + trainCode + "-" + memberId;
-        RLock lock = redissonClient.getLock(lockKey);
-        // 不用等待  直接获取锁  获取不到则直接返回  ，获取到则设置5秒过期时间
-        try {
-            boolean tryLock = lock.tryLock(0, 5, TimeUnit.SECONDS);
-            if (tryLock) {
-                LOG.info("恭喜，抢到令牌锁了！lockKey：{}", lockKey);
-            } else {
-                LOG.info("很遗憾，没抢到令牌锁！lockKey：{}", lockKey);
-                return false;
+        // 生产环境开启
+        if (!env.equals("dev")) {
+            // 防止同一个人刷票  先获取令牌锁，再校验令牌余量，防止机器人抢票，lockKey就是令牌，用来表示【谁能做什么】的一个凭证
+            String lockKey = RedisKeyPreEnum.SK_TOKEN + "-" + DateUtil.formatDate(date) + "-" + trainCode + "-" + memberId;
+            RLock lock = redissonClient.getLock(lockKey);
+            // 不用等待  直接获取锁  获取不到则直接返回  ，获取到则设置5秒过期时间
+            try {
+                boolean tryLock = lock.tryLock(0, 5, TimeUnit.SECONDS);
+                if (tryLock) {
+                    LOG.info("恭喜，抢到令牌锁了！lockKey：{}", lockKey);
+                } else {
+                    LOG.info("很遗憾，没抢到令牌锁！lockKey：{}", lockKey);
+                    return false;
+                }
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
             }
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
         }
 
 
@@ -196,7 +201,7 @@ public class SkTokenService {
             skToken.setCount(count);
             LOG.info("将该车次令牌大闸放入缓存中，key: {}， count: {}", skTokenCountKey, count);
             // 不需要更新数据库，只要放缓存即可
-            bucket.set(Long.valueOf(count),60,TimeUnit.SECONDS);
+            bucket.set(Long.valueOf(count), 60, TimeUnit.SECONDS);
             // skTokenMapper.updateByPrimaryKey(skToken);
             return true;
         }
